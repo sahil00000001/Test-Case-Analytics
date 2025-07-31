@@ -181,10 +181,203 @@
   animation: fadeIn 0.4s ease-out;
 }
 
+/* Enhanced animations for attractive UI */
+.card-animation {
+  @apply transition-all duration-500 ease-in-out;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.card-animation:hover {
+  @apply transform scale-105 shadow-2xl;
+  animation: pulse 2s infinite;
+}
+
+/* Additional keyframe animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+/* Animation utility classes */
+.animate-slide-in-left {
+  animation: slideInLeft 0.8s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.8s ease-out;
+}
+
+.animate-bounce-gentle {
+  animation: bounce 2s infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  background-size: 200px 100%;
+  animation: shimmer 2s infinite;
+}
+
 .gradient-bg {
   background: linear-gradient(135deg, hsl(var(--dashboard-background)) 0%, hsl(220, 20%, 95%) 100%);
 }
 
 .dark .gradient-bg {
   background: linear-gradient(135deg, hsl(var(--dashboard-background)) 0%, hsl(220, 13%, 7%) 100%);
+}
+
+/* Export-specific styling for professional appearance */
+#dashboard-export-container {
+  /* Ensure clean white background for export */
+  @apply bg-white;
+}
+
+/* Optimized export layout styling */
+.export-only-content {
+  @apply bg-white;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.export-header {
+  @apply bg-white border-b border-gray-200 p-4;
+}
+
+.export-main-content {
+  @apply bg-white p-8;
+  min-height: auto;
+}
+
+/* Enhanced styling for export layout */
+.export-only-content h3 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1f2937;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.export-only-content h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #374151;
+  text-align: center;
+}
+
+/* Improved color legend styling */
+.export-only-content .bg-gray-50 {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced text visibility for PDF export */
+.export-only-content .text-3xl {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.export-only-content .text-lg {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.export-only-content .text-sm {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.export-only-content .text-xs {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Export quality settings */
+.export-content {
+  @apply bg-white text-black;
+}
+
+/* Print media queries for export optimization */
+@media print {
+  .export-header {
+    @apply sticky top-0;
+  }
+  
+  #dashboard-export-container {
+    @apply min-h-0 bg-white;
+  }
+  
+  .gradient-bg {
+    background: white !important;
+  }
+  
+  .export-only-content {
+    display: block !important;
+  }
 }

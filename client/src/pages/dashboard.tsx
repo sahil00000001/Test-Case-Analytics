@@ -72,7 +72,7 @@ const PieChartComponent = ({ data, size = 200, innerRadius = 60, showTotal = fal
   };
   
   return (
-    <div className="relative bg-white dark:bg-gray-800 rounded-xl p-2" style={{ height: size, width: size }}>
+    <div className="relative bg-white dark:bg-gray-800 rounded-xl p-4" style={{ height: size + 20, width: size + 20 }}>
       {hasData ? (
         <>
           <ResponsiveContainer width="100%" height="100%">
@@ -82,8 +82,8 @@ const PieChartComponent = ({ data, size = 200, innerRadius = 60, showTotal = fal
                 cx="50%"
                 cy="50%"
                 innerRadius={innerRadius}
-                outerRadius={size / 2.5}
-                paddingAngle={2}
+                outerRadius={(size / 2) - 15} // Reduced outer radius to prevent edge touching
+                paddingAngle={3} // Increased padding between segments
                 dataKey="value"
                 animationBegin={0}
                 animationDuration={600}
@@ -93,7 +93,7 @@ const PieChartComponent = ({ data, size = 200, innerRadius = 60, showTotal = fal
                     key={`cell-${index}`} 
                     fill={getColor(entry.name)}
                     stroke="white"
-                    strokeWidth={2}
+                    strokeWidth={3} // Increased stroke width for better separation
                   />
                 ))}
               </Pie>
@@ -251,26 +251,44 @@ export default function Dashboard() {
       // Show loading toast
       toast({
         title: "Exporting Dashboard",
-        description: "Generating high-quality export...",
+        description: "Generating optimized PDF-ready export...",
       });
       
-      // Get the main dashboard container
-      const element = document.getElementById('dashboard-export-container');
-      if (!element) {
-        throw new Error('Export container not found');
+      // Show the optimized export layout temporarily
+      const exportContent = document.querySelector('.export-only-content') as HTMLElement;
+      if (!exportContent) {
+        throw new Error('Export layout not found');
       }
       
+      // Temporarily show the export content
+      exportContent.style.display = 'block';
+      
+      // Wait a moment for rendering
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       // Configure html2canvas for high quality
-      const canvas = await html2canvas(element, {
-        scale: 2, // High resolution
-        backgroundColor: '#ffffff', // White background
+      const canvas = await html2canvas(exportContent, {
+        scale: 2, // High resolution for professional quality
+        backgroundColor: '#ffffff', // White background for professional appearance
         useCORS: true, // Handle cross-origin images
         allowTaint: true,
-        height: element.scrollHeight,
-        width: element.scrollWidth,
+        height: exportContent.scrollHeight,
+        width: exportContent.scrollWidth,
         scrollX: 0,
         scrollY: 0,
+        removeContainer: false,
+        logging: false, // Disable console logs
+        windowWidth: 1200, // Ensure consistent width
+        windowHeight: exportContent.scrollHeight,
       });
+      
+      // Hide the export content again
+      exportContent.style.display = 'none';
+      
+      // Ensure minimum resolution for professional quality
+      if (canvas.width < 800) {
+        throw new Error('Export resolution too low for professional quality');
+      }
       
       // Create download link
       const link = document.createElement('a');
@@ -285,21 +303,72 @@ export default function Dashboard() {
       // Success notification
       toast({
         title: "Export Successful",
-        description: `Dashboard exported as ${generateFilename()}`,
+        description: `Optimized dashboard exported as ${generateFilename()}`,
       });
       
     } catch (error) {
       console.error('Export failed:', error);
       
-      // Error notification with retry option
-      toast({
-        title: "Export Failed",
-        description: "Unable to export dashboard. Please try again.",
-        variant: "destructive",
-      });
+      // Hide export content if it's still showing
+      const exportContent = document.querySelector('.export-only-content') as HTMLElement;
+      if (exportContent) {
+        exportContent.style.display = 'none';
+      }
+      
+      // Try fallback export method
+      try {
+        await handleFallbackExport();
+      } catch (fallbackError) {
+        console.error('Fallback export also failed:', fallbackError);
+        
+        // Error notification with retry option
+        toast({
+          title: "Export Failed",
+          description: "Unable to export dashboard. Please check your browser settings and try again.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsExporting(false);
     }
+  };
+  
+  const handleFallbackExport = async () => {
+    // Fallback method: try to export with basic settings using optimized layout
+    const exportContent = document.querySelector('.export-only-content') as HTMLElement;
+    if (!exportContent) {
+      throw new Error('Export layout not found');
+    }
+    
+    // Show the export content temporarily
+    exportContent.style.display = 'block';
+    
+    // Wait a moment for rendering
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    const canvas = await html2canvas(exportContent, {
+      scale: 1, // Reduced scale for compatibility
+      backgroundColor: '#ffffff',
+      useCORS: false,
+      allowTaint: false,
+      logging: false,
+    });
+    
+    // Hide the export content again
+    exportContent.style.display = 'none';
+    
+    const link = document.createElement('a');
+    link.download = generateFilename();
+    link.href = canvas.toDataURL('image/png', 0.8);
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Export Successful (Fallback)",
+      description: "Optimized dashboard exported with basic quality settings.",
+    });
   };
   
   const generateFilename = () => {
@@ -331,7 +400,7 @@ export default function Dashboard() {
   };
   
   return (
-    <div className="min-h-screen gradient-bg">
+    <div className="min-h-screen gradient-bg" id="dashboard-export-container">
       {/* Modern Header */}
       <header className="glass-effect backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-8 py-6">
@@ -349,9 +418,26 @@ export default function Dashboard() {
             </div>
             
             <div className="flex items-center space-x-3">
-              <Button onClick={handleExport} className="modern-button bg-gradient-to-r from-primary to-blue-600 text-white shadow-lg">
-                <Download className="w-5 h-5" />
-                <span>Export</span>
+              <Button 
+                onClick={handleExport} 
+                disabled={isExporting}
+                className={`modern-button text-white shadow-lg transition-all duration-200 ${
+                  isExporting 
+                    ? 'bg-gray-500 cursor-not-allowed' 
+                    : 'bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-blue-700 hover:shadow-xl'
+                }`}
+              >
+                {isExporting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Exporting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-5 h-5" />
+                    <span>Download Report</span>
+                  </>
+                )}
               </Button>
               
               <Button onClick={handleReset} className="modern-button bg-gradient-to-r from-gray-600 to-gray-700 text-white shadow-lg">
@@ -928,6 +1014,165 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </main>
+      
+      {/* Optimized Export Layout - Only visible during export */}
+      <div className="export-only-content hidden print:block" style={{ display: 'none' }}>
+        {/* Minimal Header */}
+        <div className="export-header bg-white p-4 border-b border-gray-200">
+          <div className="flex items-center justify-start space-x-4">
+            <span className="text-lg font-semibold text-gray-800">
+              Environment: {state.config.environment || 'Not Selected'}
+            </span>
+            <span className="text-lg font-semibold text-gray-800">
+              Site: {state.config.site || 'Not Selected'}
+            </span>
+          </div>
+        </div>
+
+        {/* Optimized Main Content Layout */}
+        <div className="export-main-content bg-white p-8">
+          {/* Color Legend at the top */}
+          <div className="mb-8 bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <h4 className="text-base font-bold text-gray-900 mb-3 text-center">Chart Color Legend</h4>
+            <div className="flex justify-center space-x-8">
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: COLORS.passed }}></div>
+                <span className="text-sm font-semibold text-gray-800">Passed Test Cases</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: COLORS.failed }}></div>
+                <span className="text-sm font-semibold text-gray-800">Failed Test Cases</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: COLORS.skipped }}></div>
+                <span className="text-sm font-semibold text-gray-800">Skipped Test Cases</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-12 min-h-[500px]">
+            
+            {/* Left Section - Overall Test Cases (60% space) */}
+            <div className="flex flex-col items-center justify-center">
+              <div className="relative mb-6">
+                <PieChartComponent 
+                  data={overallChartData} 
+                  size={320} 
+                  innerRadius={100} 
+                  showTotal={false}
+                />
+                {/* Large, clear center display */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="text-center">
+                    <div className="text-4xl font-bold text-gray-900 mb-2">{totalTestCases}</div>
+                    <div className="text-base font-medium text-gray-600 mb-3">Total Test Cases</div>
+                    <div className="space-y-1 text-sm font-bold">
+                      <div className="text-green-700">✓ Passed: {passedTestCases}</div>
+                      <div className="text-red-700">✗ Failed: {failedTestCases}</div>
+                      <div className="text-orange-700">⊖ Skipped: {skippedTestCases}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 text-center">Overall Test Cases</h3>
+            </div>
+
+            {/* Right Section - Critical Widgets (40% space) */}
+            <div className="flex flex-col justify-center space-y-8">
+              {/* Top Widget */}
+              <div className="flex flex-col items-center">
+                <div className="relative mb-3">
+                  <PieChartComponent 
+                    data={getWidgetChartData('telemetry')} 
+                    size={160} 
+                    innerRadius={45} 
+                    showTotal={false}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="text-center">
+                      <div className="text-xl font-bold text-gray-900">
+                        {(state.widgets.telemetry.total || 0)}
+                      </div>
+                      <div className="text-xs font-medium text-gray-600">Total</div>
+                    </div>
+                  </div>
+                </div>
+                <h4 className="text-base font-bold text-gray-900">Critical Telemetry</h4>
+              </div>
+
+              {/* Bottom Two Widgets Side by Side */}
+              <div className="grid grid-cols-2 gap-6">
+                <div className="flex flex-col items-center">
+                  <div className="relative mb-3">
+                    <PieChartComponent 
+                      data={getWidgetChartData('inbound')} 
+                      size={140} 
+                      innerRadius={40} 
+                      showTotal={false}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-gray-900">
+                          {(state.widgets.inbound.total || 0)}
+                        </div>
+                        <div className="text-xs font-medium text-gray-600">Total</div>
+                      </div>
+                    </div>
+                  </div>
+                  <h4 className="text-sm font-bold text-gray-900 text-center">Critical Inbound</h4>
+                </div>
+
+                <div className="flex flex-col items-center">
+                  <div className="relative mb-3">
+                    <PieChartComponent 
+                      data={getWidgetChartData('outbound')} 
+                      size={140} 
+                      innerRadius={40} 
+                      showTotal={false}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-gray-900">
+                          {(state.widgets.outbound.total || 0)}
+                        </div>
+                        <div className="text-xs font-medium text-gray-600">Total</div>
+                      </div>
+                    </div>
+                  </div>
+                  <h4 className="text-sm font-bold text-gray-900 text-center">Critical Outbound</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Unified Remarks Section - Centered */}
+          <div className="mt-8 border-t border-gray-200 pt-6 text-center">
+            <h3 className="text-lg font-bold text-gray-900 mb-3 text-center">Test Case Failure Analysis</h3>
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 max-w-4xl mx-auto">
+              <div className="text-sm text-gray-800 leading-relaxed text-center">
+                <div className="mb-3 font-medium">
+                  {state.remarks.overall || 'No general remarks provided.'}
+                </div>
+                {state.remarks.telemetry && (
+                  <div className="mt-3 p-2 bg-white rounded border-l-4 border-blue-500">
+                    <strong>Critical Telemetry Analysis:</strong> {state.remarks.telemetry}
+                  </div>
+                )}
+                {state.remarks.inbound && (
+                  <div className="mt-3 p-2 bg-white rounded border-l-4 border-green-500">
+                    <strong>Critical Inbound Analysis:</strong> {state.remarks.inbound}
+                  </div>
+                )}
+                {state.remarks.outbound && (
+                  <div className="mt-3 p-2 bg-white rounded border-l-4 border-purple-500">
+                    <strong>Critical Outbound Analysis:</strong> {state.remarks.outbound}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

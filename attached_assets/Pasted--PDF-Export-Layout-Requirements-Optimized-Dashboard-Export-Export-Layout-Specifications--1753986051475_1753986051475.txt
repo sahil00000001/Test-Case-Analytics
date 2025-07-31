@@ -1,0 +1,114 @@
+# PDF Export Layout Requirements - Optimized Dashboard Export
+
+## Export Layout Specifications
+
+### Header Section (Minimal)
+- **Remove**: Product name, branding, and unnecessary titles
+- **Include Only**:
+  - Environment name (left side)
+  - Site name (right side of environment)
+  - Clean, minimal header with essential information only
+
+### Main Content Layout
+
+#### Left Section - Overall Test Cases
+- **Large Pie Chart**: Overall test cases visualization
+- **Position**: Left side of the export
+- **Size**: Bigger than widget charts for emphasis
+- **Center Display**: 
+  - Total number of test cases (clearly visible)
+  - Passed test cases count (clearly visible)
+  - Failed test cases count (clearly visible)
+  - Skipped test cases count (clearly visible)
+- **Font Requirements**: Numbers must be large enough to be visible in PDF
+- **Title**: "Overall Test Cases" below the chart
+
+#### Right Section - Critical Widgets
+- **Layout Arrangement**:
+  - One widget chart at the top
+  - Two widget charts at the bottom (side by side)
+- **Widget Names**: Each chart must show "Critical" prefix
+  - "Critical Telemetry"
+  - "Critical Inbound" 
+  - "Critical Outbound"
+- **Chart Size**: Smaller than overall chart but proportional
+- **Number Visibility**: Ensure all counts are clearly readable in PDF
+
+### Remarks Section (Simplified)
+- **Single Remarks Box**: One unified remarks section for all widgets
+- **Remove**: Individual rectangular boxes for each widget
+- **Position**: Bottom of the export, full width
+- **Content**: Combined remarks for all test case failures
+- **Title**: "Test Case Failure Analysis" or "Remarks"
+- **Styling**: Clean, minimal border, no unnecessary decorative elements
+
+### Space Optimization Requirements
+
+#### Remove Unnecessary Elements
+- Product branding and logos
+- Excessive padding and margins
+- Redundant titles and labels
+- Multiple individual remark boxes
+- Decorative borders and shadows
+- Navigation elements
+- Interactive button styling
+
+#### Efficient Space Usage
+- **Compact Layout**: Maximize chart visibility while minimizing whitespace
+- **Proportional Sizing**: Ensure overall chart is prominent, widgets are secondary
+- **Minimal Margins**: Reduce unnecessary spacing between elements
+- **Optimal Alignment**: Clean, grid-based alignment for professional appearance
+
+### PDF-Specific Requirements
+
+#### Text Visibility
+- **Font Size**: Increase font size for all numbers in charts
+- **Font Weight**: Bold numbers for better PDF readability
+- **Color Contrast**: Ensure sufficient contrast for PDF printing
+- **Text Positioning**: Center numbers clearly within pie chart segments
+
+#### Chart Optimization
+- **Resolution**: High resolution for crisp PDF rendering
+- **Color Accuracy**: Colors must translate well to PDF format
+- **Line Thickness**: Appropriate line weights for PDF clarity
+- **Label Clarity**: All labels must be clearly readable when exported
+
+#### Layout Stability
+- **Fixed Dimensions**: Consistent sizing across different data sets
+- **Element Positioning**: Stable positioning regardless of content changes
+- **Aspect Ratios**: Maintain professional proportions in PDF
+
+### Content Priority (High to Low)
+1. **Environment and Site** (essential identification)
+2. **Overall Test Cases Chart** (primary focus)
+3. **Critical Widget Charts** (secondary analysis)
+4. **Unified Remarks Section** (failure explanation)
+5. **Minimal Branding** (if any)
+
+### Visual Hierarchy
+- **Most Prominent**: Overall test cases pie chart
+- **Secondary**: Three critical widget charts
+- **Supporting**: Environment/site information
+- **Background**: Single remarks section
+
+### Export Optimization
+- **File Size**: Optimized for reasonable PDF file size
+- **Print Quality**: Suitable for professional printing
+- **Screen Viewing**: Clear on digital screens
+- **Sharing**: Appropriate for client sharing and presentations
+
+### Quality Standards
+- **Professional Appearance**: Clean, business-ready export
+- **Information Density**: Maximum relevant information, minimum clutter
+- **Readability**: All text and numbers clearly visible
+- **Consistency**: Uniform styling throughout export
+- **Completeness**: All essential data included without redundancy
+
+### Layout Measurements
+- **Overall Chart**: Larger proportion (approximately 60% of chart space)
+- **Widget Charts**: Smaller proportion (approximately 40% of chart space combined)
+- **Header**: Minimal height, just enough for environment/site
+- **Remarks**: Compact height, full width
+- **Margins**: Minimal but professional spacing
+
+This optimized layout ensures maximum information density while maintaining professional presentation quality for client-ready PDF exports.
