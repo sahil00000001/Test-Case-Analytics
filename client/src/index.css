@@ -1,0 +1,190 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(222, 84%, 4.9%);
+  --muted: hsl(210, 40%, 98%);
+  --muted-foreground: hsl(215, 16.3%, 46.9%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(222, 84%, 4.9%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(222, 84%, 4.9%);
+  --border: hsl(214, 32%, 91.2%);
+  --input: hsl(214, 32%, 91.2%);
+  --primary: hsl(221, 83%, 53%);
+  --primary-foreground: hsl(210, 40%, 98%);
+  --secondary: hsl(210, 40%, 96%);
+  --secondary-foreground: hsl(222, 47%, 11%);
+  --accent: hsl(210, 40%, 96%);
+  --accent-foreground: hsl(222, 47%, 11%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(210, 40%, 98%);
+  --ring: hsl(221, 83%, 53%);
+  --radius: 0.75rem;
+  
+  /* Custom colors for the dashboard */
+  --success: hsl(142, 76%, 36%);
+  --error: hsl(348, 86%, 61%);
+  --warning: hsl(35, 91%, 62%);
+  --info: hsl(221, 83%, 53%);
+  --surface: hsl(0, 0%, 100%);
+  --dashboard-background: hsl(220, 20%, 97%);
+  --text-primary: hsl(220, 13%, 13%);
+  --text-secondary: hsl(220, 9%, 46%);
+  --chart-bg: hsl(0, 0%, 98%);
+  --card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(221, 83%, 53%);
+  --primary-foreground: hsl(210, 40%, 98%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  
+  /* Dark mode custom colors */
+  --success: hsl(142, 76%, 36%);
+  --error: hsl(348, 86% 61%);
+  --warning: hsl(35, 91%, 62%);
+  --info: hsl(221, 83%, 53%);
+  --surface: hsl(220, 13%, 9%);
+  --dashboard-background: hsl(220, 13%, 9%);
+  --text-primary: hsl(220, 9%, 95%);
+  --text-secondary: hsl(220, 5%, 65%);
+  --chart-bg: hsl(220, 13%, 11%);
+  --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.2), 0 2px 4px -2px rgb(0 0 0 / 0.2);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased;
+    background-color: hsl(var(--dashboard-background));
+    color: hsl(var(--text-primary));
+  }
+}
+
+@layer components {
+  .dashboard-card {
+    @apply bg-white dark:bg-gray-900 rounded-2xl border-0 shadow-lg;
+    box-shadow: var(--card-shadow);
+  }
+  
+  .chart-container {
+    @apply relative flex items-center justify-center rounded-xl p-2;
+    background: transparent;
+  }
+  
+  .no-data-overlay {
+    @apply absolute inset-0 flex items-center justify-center text-muted-foreground bg-transparent;
+  }
+  
+  .modern-input {
+    @apply w-full px-4 py-3 border-0 rounded-xl bg-gray-50 dark:bg-gray-800 text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-blue-500/20 focus:bg-white dark:focus:bg-gray-700 transition-all duration-200;
+  }
+  
+  .modern-button {
+    @apply px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center space-x-2 shadow-sm hover:shadow-md hover:scale-105 active:scale-95;
+  }
+  
+  .status-card {
+    @apply rounded-xl p-4 border-0 transition-all duration-200 hover:scale-105;
+  }
+  
+  .metric-input {
+    @apply w-full px-3 py-2 border-0 rounded-lg bg-white/80 dark:bg-gray-800/80 text-sm font-medium text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-blue-500/20 focus:bg-white dark:focus:bg-gray-700 transition-all duration-200;
+  }
+  
+  .widget-card {
+    @apply bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-xl p-4 border-0 shadow-sm transition-all duration-200 hover:shadow-md;
+  }
+  
+  .section-header {
+    @apply text-xl font-bold text-foreground mb-6 flex items-center space-x-3;
+  }
+  
+  .success-color {
+    color: hsl(var(--success));
+  }
+  
+  .error-color {
+    color: hsl(var(--error));
+  }
+  
+  .warning-color {
+    color: hsl(var(--warning));
+  }
+  
+  .info-color {
+    color: hsl(var(--info));
+  }
+  
+  .validation-error {
+    @apply ring-2 ring-red-500/20 bg-red-50 dark:bg-red-950/20;
+  }
+  
+  .validation-success {
+    @apply ring-2 ring-green-500/20 bg-green-50 dark:bg-green-950/20;
+  }
+  
+  .animate-chart-enter {
+    animation: chartEnter 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .glass-effect {
+    @apply bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50;
+  }
+}
+
+@keyframes chartEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.gradient-bg {
+  background: linear-gradient(135deg, hsl(var(--dashboard-background)) 0%, hsl(220, 20%, 95%) 100%);
+}
+
+.dark .gradient-bg {
+  background: linear-gradient(135deg, hsl(var(--dashboard-background)) 0%, hsl(220, 13%, 7%) 100%);
+}

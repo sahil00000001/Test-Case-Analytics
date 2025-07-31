@@ -1,0 +1,125 @@
+# Test Case Status Categories - Enhanced Dashboard Requirements
+
+## Test Case Status Classification
+
+### Primary Status Categories
+The dashboard must support four distinct test case status categories with individual tracking and visualization:
+
+#### 1. **Total Test Cases**
+- **Description**: Complete count of all test cases in the test suite
+- **Input Field**: Numeric input for total test case count
+- **Validation**: Must be greater than 0
+- **Auto-calculation**: Should equal the sum of Passed + Failed + Skipped cases
+
+#### 2. **Passed Test Cases**
+- **Description**: Test cases that executed successfully and met all criteria
+- **Input Field**: Numeric input for passed test case count
+- **Color Representation**: Professional Green (#10B981)
+- **Icon**: CheckCircle or similar success indicator
+- **Validation**: Cannot exceed total test cases
+
+#### 3. **Failed Test Cases**
+- **Description**: Test cases that executed but did not meet success criteria
+- **Input Field**: Numeric input for failed test case count
+- **Color Representation**: Professional Red (#EF4444)
+- **Icon**: XCircle or similar error indicator
+- **Validation**: Cannot exceed total test cases
+
+#### 4. **Skipped Test Cases**
+- **Description**: Test cases that were not executed (due to conditions, dependencies, or manual skip)
+- **Input Field**: Numeric input for skipped test case count
+- **Color Representation**: Professional Orange/Amber (#F59E0B)
+- **Icon**: MinusCircle or similar skip indicator
+- **Validation**: Cannot exceed total test cases
+
+## Implementation Requirements
+
+### Data Input Section
+```
+┌─────────────────────────────────────┐
+│ Test Case Metrics Input             │
+├─────────────────────────────────────┤
+│ Total Test Cases:    [____]         │
+│ Passed Test Cases:   [____]         │
+│ Failed Test Cases:   [____]         │
+│ Skipped Test Cases:  [____]         │
+└─────────────────────────────────────┘
+```
+
+### Validation Logic
+- **Sum Validation**: Passed + Failed + Skipped must equal Total Test Cases
+- **Real-time Error Display**: Show validation errors immediately
+- **Auto-correction Suggestions**: Highlight discrepancies
+- **Input Constraints**: All values must be non-negative integers
+
+### Pie Chart Visualization
+- **Four-Segment Pie Chart**: Each status category gets its own segment
+- **Color Coding**:
+  - Passed: Green (#10B981)
+  - Failed: Red (#EF4444)
+  - Skipped: Orange (#F59E0B)
+  - Additional segment if needed: Blue (#3B82F6)
+- **Center Display**: Total test case count
+- **Legend**: Clear status labels with colors and counts
+
+### Widget-Level Implementation
+This four-category system applies to:
+1. **Overall Test Cases** (main large pie chart)
+2. **Telemetry Widget** (individual pie chart)
+3. **Inbound Widget** (individual pie chart)
+4. **Outbound Widget** (individual pie chart)
+
+### Status Distribution Display
+Each chart should show:
+- **Percentage Breakdown**: Visual percentage representation
+- **Absolute Numbers**: Exact count for each category
+- **Status Indicators**: Icons representing each status type
+- **Hover Information**: Detailed breakdown on hover
+
+### Real-Time Updates
+- **Instant Recalculation**: Charts update immediately upon input change
+- **Smooth Transitions**: Animated transitions between different distributions
+- **Validation Feedback**: Real-time validation status display
+- **Error Prevention**: Input constraints to prevent invalid combinations
+
+### Professional Reporting
+- **Status Summary**: Clear breakdown in exported reports
+- **Color Legend**: Professional color coding explanation
+- **Category Definitions**: Clear explanation of each status type
+- **Metrics Table**: Tabular representation alongside visual charts
+
+## Enhanced User Experience
+
+### Input Form Design
+- **Grouped Layout**: Logical grouping of related inputs
+- **Visual Feedback**: Immediate validation indicators
+- **Smart Defaults**: Reasonable default values
+- **Keyboard Navigation**: Tab-friendly input sequence
+
+### Chart Enhancement
+- **Interactive Segments**: Clickable pie segments for detailed view
+- **Tooltips**: Informative hover states
+- **Animation Timing**: Staggered animations for visual appeal
+- **Responsive Scaling**: Proportional sizing across devices
+
+### Error Handling
+- **Input Validation**: Real-time sum validation
+- **Error Messages**: Clear, actionable error descriptions
+- **Visual Indicators**: Red borders, warning icons for invalid states
+- **Auto-correction**: Suggestions for fixing validation errors
+
+## Technical Specifications
+
+### State Management
+- Individual state variables for each status category
+- Computed values for percentages and validations
+- Real-time validation functions
+- Auto-save functionality for user inputs
+
+### Performance Requirements
+- **Sub-50ms Response**: Instant chart updates
+- **Smooth Animations**: 60fps transition performance  
+- **Memory Efficiency**: Optimized state updates
+- **Calculation Speed**: Real-time percentage calculations
+
+This enhanced four-category system provides comprehensive test case status tracking with professional visualization and user experience standards.
