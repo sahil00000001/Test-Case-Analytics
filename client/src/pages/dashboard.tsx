@@ -10,6 +10,7 @@ import { BarChart3, Settings, PieChart as PieChartIcon, LayoutGrid, FileText, Do
 import { useToast } from "@/hooks/use-toast";
 import html2canvas from "html2canvas";
 import type { DashboardState } from "@shared/schema";
+import yondroneLogo from "@assets/YondrOne-logo_1754034872432.png";
 
 const COLORS = {
   passed: "hsl(142, 76%, 36%)", // Professional Green
@@ -1098,9 +1099,20 @@ export default function Dashboard() {
       
       {/* Optimized Export Layout - Only visible during export */}
       <div className="export-only-content hidden print:block" style={{ display: 'none' }}>
-        {/* Minimal Header */}
-        <div className="export-header bg-white p-4 border-b border-gray-200">
-          <div className="flex items-center justify-start space-x-4">
+        {/* Minimal Header with Logo */}
+        <div className="export-header bg-white p-4 border-b border-gray-200 relative">
+          {/* Company Logo - Top Right */}
+          <div className="absolute top-4 right-4 z-10">
+            <img 
+              src={yondroneLogo} 
+              alt="YondrOne Logo" 
+              className="h-8 w-auto object-contain"
+              style={{ maxHeight: '32px' }}
+            />
+          </div>
+          
+          {/* Centered Environment and Site Info */}
+          <div className="flex items-center justify-center space-x-4">
             <span className="text-lg font-semibold text-gray-800">
               Environment: {state.config.environment || 'Not Selected'}
             </span>
@@ -1111,9 +1123,9 @@ export default function Dashboard() {
         </div>
 
         {/* Optimized Main Content Layout */}
-        <div className="export-main-content bg-white p-8">
+        <div className="export-main-content bg-white text-center" style={{ padding: '2rem 0' }}>
           {/* Color Legend at the top */}
-          <div className="mb-8 bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <div className="mb-8 bg-gray-50 border border-gray-200 rounded-lg p-4" style={{ width: 'fit-content', margin: '0 auto 2rem auto' }}>
             <h4 className="text-base font-bold text-gray-900 mb-3 text-center">Chart Color Legend</h4>
             <div className="flex justify-center space-x-8">
               <div className="flex items-center space-x-2">
@@ -1131,87 +1143,89 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-12 min-h-[500px]">
+          <div className="flex flex-col items-center justify-center space-y-12 min-h-[500px]" style={{ width: 'fit-content', margin: '0 auto' }}>
             
-            {/* Left Section - Overall Test Cases (60% space) */}
-            <div className="flex flex-col items-center justify-center">
-              <div className="relative mb-6">
-                <PieChartComponent 
-                  data={overallChartData} 
-                  size={450} 
-                  innerRadius={130} 
-                  showTotal={false}
-                />
-                {/* Large, clear center display */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="text-center">
-                    <div className="text-4xl font-bold text-gray-900 mb-2">{totalTestCases}</div>
-                    <div className="text-base font-medium text-gray-600 mb-3">Total Test Cases</div>
-                    <div className="space-y-1 text-sm font-bold">
-                      <div className="text-green-700">✓ Passed: {passedTestCases}</div>
-                      <div className="text-red-700">✗ Failed: {failedTestCases}</div>
-                      <div className="text-gray-600">⊖ Skipped: {skippedTestCases}</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 text-center">Overall Test Cases</h3>
-            </div>
-
-            {/* Right Section - Critical Features (40% space) */}
-            <div className="flex flex-col justify-center items-center">
-              {/* Critical Features Heading */}
-              <h3 className="text-2xl font-bold text-gray-900 text-center mb-4">Critical Features</h3>
-              
-              <div className="flex flex-col items-center">
+            {/* Charts Section - Side by Side Centered */}
+            <div className="flex justify-center items-start gap-16 w-full">
+              {/* Overall Test Chart */}
+              <div className="flex flex-col items-center justify-center">
                 <div className="relative mb-6">
                   <PieChartComponent 
-                    data={getWidgetChartData('telemetry')} 
-                    size={320} 
-                    innerRadius={90} 
+                    data={overallChartData} 
+                    size={450} 
+                    innerRadius={130} 
                     showTotal={false}
                   />
+                  {/* Large, clear center display */}
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <div className="text-center">
-                      <div className="text-3xl font-bold text-gray-900 mb-1">
-                        {(state.widgets.telemetry.total || 0)}
-                      </div>
-                      <div className="text-sm font-medium text-gray-600 mb-2">Total Tests</div>
-                      <div className="space-y-1 text-xs font-bold">
-                        <div className="text-green-700">✓ Passed: {state.widgets.telemetry.passed || 0}</div>
-                        <div className="text-red-700">✗ Failed: {state.widgets.telemetry.failed || 0}</div>
-                        <div className="text-gray-600">⊖ Skipped: {state.widgets.telemetry.skipped || 0}</div>
+                      <div className="text-4xl font-bold text-gray-900 mb-2">{totalTestCases}</div>
+                      <div className="text-base font-medium text-gray-600 mb-3">Total Test Cases</div>
+                      <div className="space-y-1 text-sm font-bold">
+                        <div className="text-green-700">✓ Passed: {passedTestCases}</div>
+                        <div className="text-red-700">✗ Failed: {failedTestCases}</div>
+                        <div className="text-gray-600">⊖ Skipped: {skippedTestCases}</div>
                       </div>
                     </div>
                   </div>
                 </div>
-                <h4 className="text-xl font-bold text-gray-900 text-center">Telemetry</h4>
+                <h3 className="text-2xl font-bold text-gray-900 text-center">Overall Test</h3>
+              </div>
+
+              {/* Critical Features Chart */}
+              <div className="flex flex-col justify-center items-center">
+                {/* Critical Features Heading */}
+                <h3 className="text-2xl font-bold text-gray-900 text-center mb-4">Critical Features</h3>
+                
+                <div className="flex flex-col items-center">
+                  <div className="relative mb-6">
+                    <PieChartComponent 
+                      data={getWidgetChartData('telemetry')} 
+                      size={320} 
+                      innerRadius={90} 
+                      showTotal={false}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-gray-900 mb-1">
+                          {(state.widgets.telemetry.total || 0)}
+                        </div>
+                        <div className="text-sm font-medium text-gray-600 mb-2">Total Tests</div>
+                        <div className="space-y-1 text-xs font-bold">
+                          <div className="text-green-700">✓ Passed: {state.widgets.telemetry.passed || 0}</div>
+                          <div className="text-red-700">✗ Failed: {state.widgets.telemetry.failed || 0}</div>
+                          <div className="text-gray-600">⊖ Skipped: {state.widgets.telemetry.skipped || 0}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Analysis Section - Enhanced with Comments */}
-          <div className="mt-8 border-t-2 border-gray-300 pt-8">
+          <div className="mt-8 border-t-2 border-gray-300 pt-8" style={{ width: 'fit-content', margin: '2rem auto 0 auto', maxWidth: '800px' }}>
             <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center flex items-center justify-center">
-              <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center mr-3">
+              <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center mr-3">
                 <span className="text-white text-sm">📋</span>
               </div>
-              Analysis & Insights
+              Failure Analysis
             </h3>
             
             {comments.length > 0 ? (
-              <div className="space-y-4">
+              <div className="space-y-4 max-w-3xl mx-auto">
                 {comments.map((comment, index) => (
-                  <div key={comment.id} className={`rounded-2xl p-5 border shadow-sm ${
+                  <div key={comment.id} className={`rounded-2xl p-5 border shadow-sm text-center ${
                     index % 4 === 0 ? 'bg-blue-50/60 border-blue-100' :
                     index % 4 === 1 ? 'bg-green-50/60 border-green-100' :
                     index % 4 === 2 ? 'bg-purple-50/60 border-purple-100' :
                     'bg-amber-50/60 border-amber-100'
                   }`}>
                     {comment.title && (
-                      <h4 className="text-lg font-semibold text-gray-800 mb-3">{comment.title}</h4>
+                      <h4 className="text-lg font-semibold text-gray-800 mb-3 text-center">{comment.title}</h4>
                     )}
-                    <p className={`text-gray-700 leading-relaxed whitespace-pre-wrap ${
+                    <p className={`text-gray-700 leading-relaxed whitespace-pre-wrap text-center ${
                       comment.formatting?.fontSize || 'text-base'
                     } ${comment.formatting?.isBold ? 'font-bold' : ''} ${
                       comment.formatting?.isItalic ? 'italic' : ''
@@ -1222,7 +1236,7 @@ export default function Dashboard() {
                 ))}
               </div>
             ) : (
-              <div className="bg-gradient-to-br from-gray-50 to-blue-50 border-2 border-gray-200 rounded-2xl p-8 shadow-lg text-center">
+              <div className="bg-gradient-to-br from-gray-50 to-blue-50 border-2 border-gray-200 rounded-2xl p-8 shadow-lg text-center max-w-2xl mx-auto">
                 <div className="text-gray-500 text-lg">
                   No analysis comments have been added yet.
                 </div>

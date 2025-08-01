@@ -60,6 +60,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes (August 1, 2025)
 
+### Report Layout Updates
+- **Telemetry Label Removal**: Removed "Telemetry" heading from export report section while maintaining Critical Features heading
+- **Content Rebranding**: Changed "Analysis & Insights" to "Failure Analysis" for better focus on test failures
+- **Chart Title Update**: Renamed "Overall Test Cases" to "Overall Test" for concise presentation
+- **Center Alignment**: All export report content now center-aligned for professional presentation
+- **Color Consistency**: Fixed "Skipped" status to display in gray instead of orange across all export charts
+
 ### Dashboard Restructuring & Critical Features Enhancement
 - **Widget Consolidation**: Removed 3 separate Telemetry Critical widgets and replaced with single "Critical Features" widget containing only Telemetry
 - **Naming Updates**: Changed "Critical Telemetry" to "Telemetry" throughout dashboard and export sections
