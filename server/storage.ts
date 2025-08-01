@@ -1,37 +1,30 @@
-import { type User, type InsertUser } from "@shared/schema";
+import { type DashboardState } from "@shared/schema";
 import { randomUUID } from "crypto";
 
-// modify the interface with any CRUD methods
-// you might need
-
+// Storage interface for dashboard data
 export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  saveDashboardData(id: string, data: DashboardState): Promise<void>;
+  getDashboardData(id: string): Promise<DashboardState | undefined>;
+  getAllDashboardData(): Promise<DashboardState[]>;
 }
 
 export class MemStorage implements IStorage {
-  private users: Map<string, User>;
+  private dashboards: Map<string, DashboardState>;
 
   constructor() {
-    this.users = new Map();
+    this.dashboards = new Map();
   }
 
-  async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+  async saveDashboardData(id: string, data: DashboardState): Promise<void> {
+    this.dashboards.set(id, data);
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+  async getDashboardData(id: string): Promise<DashboardState | undefined> {
+    return this.dashboards.get(id);
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+  async getAllDashboardData(): Promise<DashboardState[]> {
+    return Array.from(this.dashboards.values());
   }
 }
 
