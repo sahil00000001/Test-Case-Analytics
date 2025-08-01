@@ -1150,7 +1150,7 @@ export default function Dashboard() {
                     <div className="space-y-1 text-sm font-bold">
                       <div className="text-green-700">✓ Passed: {passedTestCases}</div>
                       <div className="text-red-700">✗ Failed: {failedTestCases}</div>
-                      <div className="text-orange-700">⊖ Skipped: {skippedTestCases}</div>
+                      <div className="text-gray-600">⊖ Skipped: {skippedTestCases}</div>
                     </div>
                   </div>
                 </div>
@@ -1158,8 +1158,11 @@ export default function Dashboard() {
               <h3 className="text-2xl font-bold text-gray-900 text-center">Overall Test Cases</h3>
             </div>
 
-            {/* Right Section - Telemetry (40% space) */}
+            {/* Right Section - Critical Features (40% space) */}
             <div className="flex flex-col justify-center items-center">
+              {/* Critical Features Heading */}
+              <h3 className="text-2xl font-bold text-gray-900 text-center mb-4">Critical Features</h3>
+              
               <div className="flex flex-col items-center">
                 <div className="relative mb-6">
                   <PieChartComponent 
@@ -1182,7 +1185,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 text-center">Telemetry</h3>
+                <h4 className="text-xl font-bold text-gray-900 text-center">Telemetry</h4>
               </div>
             </div>
           </div>
