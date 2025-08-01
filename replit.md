@@ -58,22 +58,27 @@ Preferred communication style: Simple, everyday language.
 5. **Enhanced Validation**: Zod schemas with custom refinement rules for data integrity
 6. **Advanced Visualization**: Recharts renders four-segment pie charts with center totals and enhanced tooltips
 
-## Recent Changes (January 31, 2025)
+## Recent Changes (August 1, 2025)
 
-### Enhanced Four-Category Test Case System
-- **Updated Schema**: Modified shared schema to support Total, Passed, Failed, and Skipped test cases
-- **New Environment/Site Options**: Updated to use client-specified PROD/UAV/DEV/Sandbox environments and LON1A/LON1B/NOV1A/NOV1B/FRA1/JHB1A sites
-- **Real-time Validation**: Implemented comprehensive validation with visual error feedback
-- **Enhanced UI Components**: Redesigned input sections with icons, improved layouts, and professional status indicators
-- **Advanced Charts**: Added center total displays, four-color coding, and enhanced tooltips with percentages
+### Dashboard Restructuring & Critical Features Enhancement
+- **Widget Consolidation**: Removed 3 separate Telemetry Critical widgets and replaced with single "Critical Features" widget containing only Telemetry
+- **Naming Updates**: Changed "Critical Telemetry" to "Telemetry" throughout dashboard and export sections
+- **Enhanced Telemetry Widget**: Added Total Test Cases and Passed Test Cases input fields in premium design layout
+- **Color Scheme Update**: Changed "Skipped" status color from yellow/orange to gray across all charts and labels for better professional appearance
 
-### Professional Export Enhancement & Animation System
-- **Optimized PDF Export Layout**: Streamlined export with minimal header, better chart spacing, and centered remarks section
-- **Color Legend Integration**: Added comprehensive color legend explaining chart meanings (green=passed, red=failed, orange=skipped)
-- **Advanced Animation System**: Implemented attractive animations throughout entire website including glow, bounce, slide, and shimmer effects
-- **Educational Guidance**: Added step-by-step tooltips and helpful guidance for better user experience
-- **Enhanced Chart Sizing**: Fixed pie chart dimensions to prevent segments touching edges with proper spacing
-- **Professional Button Styling**: Enhanced export buttons with animations and professional messaging
+### Dual-Size Chart System for Dashboard vs Export
+- **Dashboard Charts**: Optimized for daily use with practical sizes (Overall: 280px, Telemetry: 200px)
+- **Export Charts**: Professional large sizes for reports (Overall: 450px, Telemetry: 320px) with enhanced data display
+- **Export Enhancement**: Added comprehensive data display within charts showing total, passed, failed, and skipped counts
+- **Premium Export Design**: Enhanced export layout with larger charts, better spacing, and professional styling for attractive reports
+
+### Modular Comment System Implementation
+- **Complete Redesign**: Replaced static text areas with dynamic modular comment system
+- **Add New Comment**: "+" button to create new comment boxes with title and detailed content fields
+- **Chronological Display**: Comments appear in chronological order with numbered sequence and timestamps
+- **Full CRUD Operations**: Save, edit, delete functionality for all comments with real-time state management
+- **Export Integration**: Comments automatically included in exported reports with professional formatting
+- **Enhanced UX**: Professional styling with gradients, shadows, hover effects, and smooth animations
 
 ## External Dependencies
 

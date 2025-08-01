@@ -14,7 +14,7 @@ import type { DashboardState } from "@shared/schema";
 const COLORS = {
   passed: "hsl(142, 76%, 36%)", // Professional Green
   failed: "hsl(348, 86%, 61%)", // Professional Red
-  skipped: "hsl(35, 91%, 62%)", // Professional Orange
+  skipped: "hsl(210, 6%, 50%)", // Professional Gray
   info: "hsl(221, 83%, 53%)",   // Professional Blue
 };
 
@@ -129,8 +129,6 @@ export default function Dashboard() {
     testCases: {},
     widgets: {
       telemetry: {},
-      inbound: {},
-      outbound: {},
     },
     remarks: {},
   });
@@ -140,6 +138,30 @@ export default function Dashboard() {
   
   // Export state
   const [isExporting, setIsExporting] = useState(false);
+  
+  // Comment system state
+  const [comments, setComments] = useState<Array<{
+    id: string;
+    title: string;
+    content: string;
+    timestamp: number;
+    formatting: {
+      isBold: boolean;
+      isItalic: boolean;
+      fontSize: string;
+    };
+  }>>([]);
+  const [isAddingComment, setIsAddingComment] = useState(false);
+  const [newCommentTitle, setNewCommentTitle] = useState('');
+  const [newCommentContent, setNewCommentContent] = useState('');
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editingTitle, setEditingTitle] = useState('');
+  const [editingContent, setEditingContent] = useState('');
+  
+  // Formatting state
+  const [isBold, setIsBold] = useState(false);
+  const [isItalic, setIsItalic] = useState(false);
+  const [fontSize, setFontSize] = useState('text-base');
   
   const totalTestCases = state.testCases.totalTestCases || 0;
   const passedTestCases = state.testCases.passedTestCases || 0;
@@ -171,6 +193,7 @@ export default function Dashboard() {
   
   const getWidgetChartData = (widgetKey: keyof typeof state.widgets): ChartData[] => {
     const widget = state.widgets[widgetKey];
+    if (!widget) return [];
     return [
       { name: "Passed", value: widget.passed || 0 },
       { name: "Failed", value: widget.failed || 0 },
@@ -386,16 +409,81 @@ export default function Dashboard() {
       testCases: {},
       widgets: {
         telemetry: {},
-        inbound: {},
-        outbound: {},
       },
       remarks: {},
     });
     setValidationErrors([]);
+    setComments([]);
     
     toast({
       title: "Dashboard Reset",
       description: "All data has been cleared successfully.",
+    });
+  };
+
+  // Comment system handlers
+  const handleSaveComment = () => {
+    if (!newCommentContent.trim()) return;
+    
+    const newComment = {
+      id: Date.now().toString(),
+      title: newCommentTitle.trim() || '',
+      content: newCommentContent.trim(),
+      timestamp: Date.now(),
+      formatting: {
+        isBold,
+        isItalic,
+        fontSize,
+      },
+    };
+    
+    setComments(prev => [...prev, newComment]);
+    setNewCommentTitle('');
+    setNewCommentContent('');
+    setIsAddingComment(false);
+    
+    // Reset formatting
+    setIsBold(false);
+    setIsItalic(false);
+    setFontSize('text-base');
+    
+    toast({
+      title: "Comment Added",
+      description: "Your analysis comment has been saved successfully.",
+    });
+  };
+
+  const handleEditComment = (comment: typeof comments[0]) => {
+    setEditingCommentId(comment.id);
+    setEditingTitle(comment.title);
+    setEditingContent(comment.content);
+  };
+
+  const handleUpdateComment = (commentId: string) => {
+    if (!editingTitle.trim() || !editingContent.trim()) return;
+    
+    setComments(prev => prev.map(comment => 
+      comment.id === commentId 
+        ? { ...comment, title: editingTitle.trim(), content: editingContent.trim() }
+        : comment
+    ));
+    
+    setEditingCommentId(null);
+    setEditingTitle('');
+    setEditingContent('');
+    
+    toast({
+      title: "Comment Updated",
+      description: "Your changes have been saved successfully.",
+    });
+  };
+
+  const handleDeleteComment = (commentId: string) => {
+    setComments(prev => prev.filter(comment => comment.id !== commentId));
+    
+    toast({
+      title: "Comment Deleted",
+      description: "The comment has been removed successfully.",
     });
   };
   
@@ -627,9 +715,9 @@ export default function Dashboard() {
         </div>
         
         {/* Analytics Section - REVERSED LAYOUT */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 xl:grid-cols-5 gap-8 mb-12">
           
-          {/* LEFT SIDE: Three Widget Charts */}
+          {/* LEFT SIDE: Single Critical Features Widget */}
           <div className="xl:col-span-2 space-y-6">
             <Card className="dashboard-card">
               <CardHeader className="pb-4">
@@ -637,199 +725,70 @@ export default function Dashboard() {
                   <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center mr-2">
                     <LayoutGrid className="w-4 h-4 text-white" />
                   </div>
-                  Widget Analytics
+                  Critical Features
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  
-                  {/* Telemetry Widget */}
-                  <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl p-4">
-                    <div className="text-center mb-3">
-                      <h4 className="text-sm font-bold text-foreground flex items-center justify-center mb-2">
-                        <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg flex items-center justify-center mr-2">
-                          <BarChart3 className="w-3 h-3 text-white" />
+                <div className="flex justify-center">
+                  {/* Single Telemetry Widget - Premium Design */}
+                  <div className="bg-gradient-to-br from-blue-50 via-cyan-50 to-indigo-50 dark:from-blue-900/30 dark:via-cyan-900/30 dark:to-indigo-900/30 rounded-2xl p-8 shadow-2xl border border-blue-200/50 dark:border-blue-700/50 max-w-2xl w-full">
+                    <div className="text-center mb-6">
+                      <h4 className="text-2xl font-bold text-foreground flex items-center justify-center mb-6">
+                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 via-cyan-500 to-indigo-600 rounded-xl flex items-center justify-center mr-4 shadow-lg">
+                          <BarChart3 className="w-6 h-6 text-white" />
                         </div>
                         Telemetry
                       </h4>
                       
-                      {/* Total input for Telemetry */}
-                      <div className="mb-3">
-                        <Label className="text-xs text-muted-foreground">Total Tests</Label>
-                        <Input
-                          type="number"
-                          value={state.widgets.telemetry.total || ""}
-                          onChange={(e) => handleWidgetChange('telemetry', 'total', e.target.value)}
-                          className="metric-input text-sm text-center h-8"
-                          placeholder="0"
-                          min="0"
-                        />
-                      </div>
-                      
-                      <div className="mb-3">
-                        <PieChartComponent data={getWidgetChartData('telemetry')} size={120} innerRadius={30} showTotal={true} />
-                      </div>
-                      
-                      <div className="grid grid-cols-3 gap-2 text-xs">
-                        <div>
-                          <Label className="text-xs text-muted-foreground">Passed</Label>
+                      {/* Total and Passed Test Cases - Side by Side */}
+                      <div className="grid grid-cols-2 gap-4 mb-6">
+                        <div className="bg-white/80 dark:bg-gray-800/80 rounded-xl p-4 shadow-md">
+                          <Label className="text-base font-semibold text-muted-foreground block mb-2">Total Test Cases</Label>
+                          <Input
+                            type="number"
+                            value={state.widgets.telemetry.total || ""}
+                            onChange={(e) => handleWidgetChange('telemetry', 'total', e.target.value)}
+                            className="metric-input text-xl text-center h-12 font-bold border-2 border-blue-200 focus:border-blue-400"
+                            placeholder="0"
+                            min="0"
+                          />
+                        </div>
+                        <div className="bg-green-50/80 dark:bg-green-900/30 rounded-xl p-4 shadow-md border border-green-200 dark:border-green-700">
+                          <Label className="text-base font-semibold text-green-700 dark:text-green-300 block mb-2">Passed Test Cases</Label>
                           <Input
                             type="number"
                             value={state.widgets.telemetry.passed || ""}
                             onChange={(e) => handleWidgetChange('telemetry', 'passed', e.target.value)}
-                            className="metric-input text-xs h-7"
+                            className="metric-input text-xl text-center h-12 font-bold border-2 border-green-200 focus:border-green-400 bg-white/90 dark:bg-gray-700/90"
                             placeholder="0"
                             min="0"
                           />
                         </div>
-                        <div>
-                          <Label className="text-xs text-muted-foreground">Failed</Label>
+                      </div>
+                      
+                      <div className="mb-6 bg-white/50 dark:bg-gray-800/30 rounded-2xl p-4 shadow-inner">
+                        <PieChartComponent data={getWidgetChartData('telemetry')} size={200} innerRadius={60} showTotal={true} />
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4 text-base">
+                        <div className="bg-red-50/80 dark:bg-red-900/30 rounded-xl p-4 shadow-md border border-red-200 dark:border-red-700">
+                          <Label className="text-base font-semibold text-red-700 dark:text-red-300 block mb-2">Failed</Label>
                           <Input
                             type="number"
                             value={state.widgets.telemetry.failed || ""}
                             onChange={(e) => handleWidgetChange('telemetry', 'failed', e.target.value)}
-                            className="metric-input text-xs h-7"
+                            className="metric-input text-lg text-center h-11 font-bold border-2 border-red-200 focus:border-red-400 bg-white/90 dark:bg-gray-700/90"
                             placeholder="0"
                             min="0"
                           />
                         </div>
-                        <div>
-                          <Label className="text-xs text-muted-foreground">Skipped</Label>
+                        <div className="bg-gray-50/80 dark:bg-gray-700/30 rounded-xl p-4 shadow-md border border-gray-200 dark:border-gray-600">
+                          <Label className="text-base font-semibold text-gray-700 dark:text-gray-300 block mb-2">Skipped</Label>
                           <Input
                             type="number"
                             value={state.widgets.telemetry.skipped || ""}
                             onChange={(e) => handleWidgetChange('telemetry', 'skipped', e.target.value)}
-                            className="metric-input text-xs h-7"
-                            placeholder="0"
-                            min="0"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Inbound Widget */}
-                  <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl p-4">
-                    <div className="text-center mb-3">
-                      <h4 className="text-sm font-bold text-foreground flex items-center justify-center mb-2">
-                        <div className="w-6 h-6 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center mr-2">
-                          <LayoutGrid className="w-3 h-3 text-white" />
-                        </div>
-                        Inbound
-                      </h4>
-                      
-                      {/* Total input for Inbound */}
-                      <div className="mb-3">
-                        <Label className="text-xs text-muted-foreground">Total Tests</Label>
-                        <Input
-                          type="number"
-                          value={state.widgets.inbound.total || ""}
-                          onChange={(e) => handleWidgetChange('inbound', 'total', e.target.value)}
-                          className="metric-input text-sm text-center h-8"
-                          placeholder="0"
-                          min="0"
-                        />
-                      </div>
-                      
-                      <div className="mb-3">
-                        <PieChartComponent data={getWidgetChartData('inbound')} size={120} innerRadius={30} showTotal={true} />
-                      </div>
-                      
-                      <div className="grid grid-cols-3 gap-2 text-xs">
-                        <div>
-                          <Label className="text-xs text-muted-foreground">Passed</Label>
-                          <Input
-                            type="number"
-                            value={state.widgets.inbound.passed || ""}
-                            onChange={(e) => handleWidgetChange('inbound', 'passed', e.target.value)}
-                            className="metric-input text-xs h-7"
-                            placeholder="0"
-                            min="0"
-                          />
-                        </div>
-                        <div>
-                          <Label className="text-xs text-muted-foreground">Failed</Label>
-                          <Input
-                            type="number"
-                            value={state.widgets.inbound.failed || ""}
-                            onChange={(e) => handleWidgetChange('inbound', 'failed', e.target.value)}
-                            className="metric-input text-xs h-7"
-                            placeholder="0"
-                            min="0"
-                          />
-                        </div>
-                        <div>
-                          <Label className="text-xs text-muted-foreground">Skipped</Label>
-                          <Input
-                            type="number"
-                            value={state.widgets.inbound.skipped || ""}
-                            onChange={(e) => handleWidgetChange('inbound', 'skipped', e.target.value)}
-                            className="metric-input text-xs h-7"
-                            placeholder="0"
-                            min="0"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Outbound Widget */}
-                  <div className="bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 rounded-xl p-4">
-                    <div className="text-center mb-3">
-                      <h4 className="text-sm font-bold text-foreground flex items-center justify-center mb-2">
-                        <div className="w-6 h-6 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg flex items-center justify-center mr-2">
-                          <LayoutGrid className="w-3 h-3 text-white" />
-                        </div>
-                        Outbound
-                      </h4>
-                      
-                      {/* Total input for Outbound */}
-                      <div className="mb-3">
-                        <Label className="text-xs text-muted-foreground">Total Tests</Label>
-                        <Input
-                          type="number"
-                          value={state.widgets.outbound.total || ""}
-                          onChange={(e) => handleWidgetChange('outbound', 'total', e.target.value)}
-                          className="metric-input text-sm text-center h-8"
-                          placeholder="0"
-                          min="0"
-                        />
-                      </div>
-                      
-                      <div className="mb-3">
-                        <PieChartComponent data={getWidgetChartData('outbound')} size={120} innerRadius={30} showTotal={true} />
-                      </div>
-                      
-                      <div className="grid grid-cols-3 gap-2 text-xs">
-                        <div>
-                          <Label className="text-xs text-muted-foreground">Passed</Label>
-                          <Input
-                            type="number"
-                            value={state.widgets.outbound.passed || ""}
-                            onChange={(e) => handleWidgetChange('outbound', 'passed', e.target.value)}
-                            className="metric-input text-xs h-7"
-                            placeholder="0"
-                            min="0"
-                          />
-                        </div>
-                        <div>
-                          <Label className="text-xs text-muted-foreground">Failed</Label>
-                          <Input
-                            type="number"
-                            value={state.widgets.outbound.failed || ""}
-                            onChange={(e) => handleWidgetChange('outbound', 'failed', e.target.value)}
-                            className="metric-input text-xs h-7"
-                            placeholder="0"
-                            min="0"
-                          />
-                        </div>
-                        <div>
-                          <Label className="text-xs text-muted-foreground">Skipped</Label>
-                          <Input
-                            type="number"
-                            value={state.widgets.outbound.skipped || ""}
-                            onChange={(e) => handleWidgetChange('outbound', 'skipped', e.target.value)}
-                            className="metric-input text-xs h-7"
+                            className="metric-input text-lg text-center h-11 font-bold border-2 border-gray-200 focus:border-gray-400 bg-white/90 dark:bg-gray-700/90"
                             placeholder="0"
                             min="0"
                           />
@@ -842,43 +801,43 @@ export default function Dashboard() {
             </Card>
           </div>
           
-          {/* RIGHT SIDE: Overall Chart */}
-          <div className="xl:col-span-1">
+          {/* RIGHT SIDE: Overall Chart - 75% Larger */}
+          <div className="xl:col-span-3">
             <Card className="dashboard-card">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-bold flex items-center">
-                  <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center mr-2">
-                    <PieChartIcon className="w-4 h-4 text-white" />
+              <CardHeader className="pb-6">
+                <CardTitle className="text-2xl font-bold flex items-center">
+                  <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center mr-3">
+                    <PieChartIcon className="w-5 h-5 text-white" />
                   </div>
-                  Overall Distribution
+                  Overall Test Cases
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-center">
-                <div className="mb-4">
-                  <PieChartComponent data={overallChartData} size={240} innerRadius={60} showTotal={true} />
+                <div className="mb-6">
+                  <PieChartComponent data={overallChartData} size={280} innerRadius={80} showTotal={true} />
                 </div>
                 
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                <div className="grid grid-cols-3 gap-4 text-base">
+                  <div className="flex items-center justify-between p-4 bg-green-50 dark:bg-green-900/20 rounded-xl">
                     <div className="flex items-center">
-                      <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                      <span>Passed</span>
+                      <div className="w-4 h-4 bg-green-500 rounded-full mr-3"></div>
+                      <span className="font-semibold">Passed</span>
                     </div>
-                    <span className="font-bold">{passedTestCases}</span>
+                    <span className="font-bold text-lg">{passedTestCases}</span>
                   </div>
-                  <div className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                  <div className="flex items-center justify-between p-4 bg-red-50 dark:bg-red-900/20 rounded-xl">
                     <div className="flex items-center">
-                      <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
-                      <span>Failed</span>
+                      <div className="w-4 h-4 bg-red-500 rounded-full mr-3"></div>
+                      <span className="font-semibold">Failed</span>
                     </div>
-                    <span className="font-bold">{failedTestCases}</span>
+                    <span className="font-bold text-lg">{failedTestCases}</span>
                   </div>
-                  <div className="flex items-center justify-between p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                  <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/20 rounded-xl">
                     <div className="flex items-center">
-                      <div className="w-3 h-3 bg-orange-500 rounded-full mr-2"></div>
-                      <span>Skipped</span>
+                      <div className="w-4 h-4 bg-gray-500 rounded-full mr-3"></div>
+                      <span className="font-semibold">Skipped</span>
                     </div>
-                    <span className="font-bold">{skippedTestCases}</span>
+                    <span className="font-bold text-lg">{skippedTestCases}</span>
                   </div>
                 </div>
               </CardContent>
@@ -886,7 +845,7 @@ export default function Dashboard() {
           </div>
         </div>
         
-        {/* Remarks Section */}
+        {/* Analysis & Insights Section - Modular Comment System */}
         <Card className="dashboard-card mb-12 animate-fade-in">
           <CardHeader className="pb-6">
             <CardTitle className="section-header">
@@ -896,78 +855,200 @@ export default function Dashboard() {
               Analysis & Insights
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-8">
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-              <div className="space-y-4">
-                <Label className="text-lg font-semibold text-foreground flex items-center">
-                  <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mr-2"></div>
-                  Overall Analysis
-                </Label>
-                <Textarea
-                  rows={8}
-                  placeholder="Describe overall test failures, patterns, root causes, and improvement recommendations..."
-                  value={state.remarks.overall || ""}
-                  onChange={(e) => handleRemarksChange('overall', e.target.value)}
-                  className="modern-input resize-none text-base"
-                />
-              </div>
-              
-              <div className="space-y-6">
-                <Label className="text-lg font-semibold text-foreground flex items-center">
-                  <div className="w-3 h-3 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full mr-2"></div>
-                  Widget-Specific Notes
-                </Label>
-                
+          <CardContent className="space-y-6">
+            {/* Add New Comment Button */}
+            <div className="flex justify-center">
+              <button
+                onClick={() => setIsAddingComment(true)}
+                className="flex items-center space-x-3 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isAddingComment}
+              >
+                <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center">
+                  <span className="text-lg font-bold">+</span>
+                </div>
+                Add New Comment
+              </button>
+            </div>
+
+            {/* New Comment Input Box */}
+            {isAddingComment && (
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-6 border-2 border-blue-200 dark:border-blue-700 shadow-lg animate-fade-in">
                 <div className="space-y-4">
-                  <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl p-4">
-                    <Label className="text-sm font-bold text-foreground flex items-center mb-2">
-                      <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg flex items-center justify-center mr-2">
-                        <BarChart3 className="w-3 h-3 text-white" />
-                      </div>
-                      Telemetry Widget
-                    </Label>
-                    <Textarea
-                      rows={3}
-                      placeholder="Telemetry-specific failures, patterns, and issues..."
-                      value={state.remarks.telemetry || ""}
-                      onChange={(e) => handleRemarksChange('telemetry', e.target.value)}
-                      className="modern-input resize-none text-sm"
+                  <div>
+                    <Label className="text-base font-semibold text-foreground mb-2 block">Comment Title (Optional)</Label>
+                    <Input
+                      type="text"
+                      value={newCommentTitle}
+                      onChange={(e) => setNewCommentTitle(e.target.value)}
+                      placeholder="Enter a title (optional)..."
+                      className="modern-input text-base h-12 border-2 border-blue-200 focus:border-blue-400"
                     />
                   </div>
-                  
-                  <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl p-4">
-                    <Label className="text-sm font-bold text-foreground flex items-center mb-2">
-                      <div className="w-6 h-6 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center mr-2">
-                        <LayoutGrid className="w-3 h-3 text-white" />
-                      </div>
-                      Inbound Widget
-                    </Label>
+                  <div>
+                    <Label className="text-base font-semibold text-foreground mb-2 block">Comment Content</Label>
+                    
+                    {/* Formatting Toolbar */}
+                    <div className="flex items-center space-x-2 mb-3 p-2 bg-white/60 rounded-lg border border-gray-200">
+                      <button
+                        type="button"
+                        onClick={() => setIsBold(!isBold)}
+                        className={`px-3 py-1 rounded text-sm font-bold transition-colors ${
+                          isBold ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        B
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsItalic(!isItalic)}
+                        className={`px-3 py-1 rounded text-sm italic transition-colors ${
+                          isItalic ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        I
+                      </button>
+                      <select
+                        value={fontSize}
+                        onChange={(e) => setFontSize(e.target.value)}
+                        className="px-2 py-1 rounded text-sm bg-gray-100 border border-gray-300 focus:border-blue-400"
+                      >
+                        <option value="text-sm">Small</option>
+                        <option value="text-base">Normal</option>
+                        <option value="text-lg">Large</option>
+                        <option value="text-xl">Extra Large</option>
+                      </select>
+                    </div>
+                    
                     <Textarea
-                      rows={3}
-                      placeholder="Inbound-specific failures, patterns, and issues..."
-                      value={state.remarks.inbound || ""}
-                      onChange={(e) => handleRemarksChange('inbound', e.target.value)}
-                      className="modern-input resize-none text-sm"
+                      rows={6}
+                      value={newCommentContent}
+                      onChange={(e) => setNewCommentContent(e.target.value)}
+                      placeholder="Write your analysis, insights, observations, or recommendations..."
+                      className={`modern-input resize-none border-2 border-blue-200 focus:border-blue-400 ${fontSize} ${
+                        isBold ? 'font-bold' : ''
+                      } ${isItalic ? 'italic' : ''}`}
                     />
                   </div>
-                  
-                  <div className="bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 rounded-xl p-4">
-                    <Label className="text-sm font-bold text-foreground flex items-center mb-2">
-                      <div className="w-6 h-6 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg flex items-center justify-center mr-2">
-                        <LayoutGrid className="w-3 h-3 text-white" />
-                      </div>
-                      Outbound Widget
-                    </Label>
-                    <Textarea
-                      rows={3}
-                      placeholder="Outbound-specific failures, patterns, and issues..."
-                      value={state.remarks.outbound || ""}
-                      onChange={(e) => handleRemarksChange('outbound', e.target.value)}
-                      className="modern-input resize-none text-sm"
-                    />
+                  <div className="flex justify-end space-x-3">
+                    <button
+                      onClick={() => {
+                        setIsAddingComment(false);
+                        setNewCommentTitle('');
+                        setNewCommentContent('');
+                      }}
+                      className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSaveComment}
+                      disabled={!newCommentContent.trim()}
+                      className="px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg font-semibold shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    >
+                      Save Comment
+                    </button>
                   </div>
                 </div>
               </div>
+            )}
+
+            {/* Saved Comments Display - Clean Card Design */}
+            <div className="space-y-3">
+              {comments.map((comment, index) => (
+                <div
+                  key={comment.id}
+                  className={`rounded-2xl p-5 border shadow-sm hover:shadow-md transition-all duration-200 ${
+                    index % 4 === 0 ? 'bg-blue-50/60 border-blue-100' :
+                    index % 4 === 1 ? 'bg-green-50/60 border-green-100' :
+                    index % 4 === 2 ? 'bg-purple-50/60 border-purple-100' :
+                    'bg-amber-50/60 border-amber-100'
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      {editingCommentId === comment.id ? (
+                        <div className="space-y-3">
+                          <Input
+                            type="text"
+                            value={editingTitle}
+                            onChange={(e) => setEditingTitle(e.target.value)}
+                            className="text-lg font-semibold bg-white/80 border-gray-200 focus:border-blue-400"
+                          />
+                          <Textarea
+                            rows={3}
+                            value={editingContent}
+                            onChange={(e) => setEditingContent(e.target.value)}
+                            className="bg-white/80 border-gray-200 focus:border-blue-400 resize-none"
+                          />
+                        </div>
+                      ) : (
+                        <>
+                          {comment.title && (
+                            <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                              {comment.title}
+                            </h4>
+                          )}
+                          <p className={`text-gray-700 leading-relaxed whitespace-pre-wrap ${
+                            comment.formatting?.fontSize || 'text-base'
+                          } ${comment.formatting?.isBold ? 'font-bold' : ''} ${
+                            comment.formatting?.isItalic ? 'italic' : ''
+                          }`}>
+                            {comment.content}
+                          </p>
+                        </>
+                      )}
+                    </div>
+                    
+                    <div className="flex space-x-1 ml-4">
+                      {editingCommentId === comment.id ? (
+                        <>
+                          <button
+                            onClick={() => handleUpdateComment(comment.id)}
+                            className="p-1.5 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm"
+                          >
+                            ✓
+                          </button>
+                          <button
+                            onClick={() => {
+                              setEditingCommentId(null);
+                              setEditingTitle('');
+                              setEditingContent('');
+                            }}
+                            className="p-1.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm"
+                          >
+                            ✕
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => handleEditComment(comment)}
+                            className="p-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            onClick={() => handleDeleteComment(comment.id)}
+                            className="p-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
+                          >
+                            🗑️
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              {comments.length === 0 && !isAddingComment && (
+                <div className="text-center py-8 text-muted-foreground">
+                  <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <FileText className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <p className="text-lg font-medium">No comments added yet</p>
+                  <p className="text-sm">Click the + button above to add your first analysis comment</p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -1057,8 +1138,8 @@ export default function Dashboard() {
               <div className="relative mb-6">
                 <PieChartComponent 
                   data={overallChartData} 
-                  size={320} 
-                  innerRadius={100} 
+                  size={450} 
+                  innerRadius={130} 
                   showTotal={false}
                 />
                 {/* Large, clear center display */}
@@ -1077,99 +1158,73 @@ export default function Dashboard() {
               <h3 className="text-2xl font-bold text-gray-900 text-center">Overall Test Cases</h3>
             </div>
 
-            {/* Right Section - Critical Widgets (40% space) */}
-            <div className="flex flex-col justify-center space-y-8">
-              {/* Top Widget */}
+            {/* Right Section - Telemetry (40% space) */}
+            <div className="flex flex-col justify-center items-center">
               <div className="flex flex-col items-center">
-                <div className="relative mb-3">
+                <div className="relative mb-6">
                   <PieChartComponent 
                     data={getWidgetChartData('telemetry')} 
-                    size={160} 
-                    innerRadius={45} 
+                    size={320} 
+                    innerRadius={90} 
                     showTotal={false}
                   />
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <div className="text-center">
-                      <div className="text-xl font-bold text-gray-900">
+                      <div className="text-3xl font-bold text-gray-900 mb-1">
                         {(state.widgets.telemetry.total || 0)}
                       </div>
-                      <div className="text-xs font-medium text-gray-600">Total</div>
-                    </div>
-                  </div>
-                </div>
-                <h4 className="text-base font-bold text-gray-900">Critical Telemetry</h4>
-              </div>
-
-              {/* Bottom Two Widgets Side by Side */}
-              <div className="grid grid-cols-2 gap-6">
-                <div className="flex flex-col items-center">
-                  <div className="relative mb-3">
-                    <PieChartComponent 
-                      data={getWidgetChartData('inbound')} 
-                      size={140} 
-                      innerRadius={40} 
-                      showTotal={false}
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div className="text-center">
-                        <div className="text-lg font-bold text-gray-900">
-                          {(state.widgets.inbound.total || 0)}
-                        </div>
-                        <div className="text-xs font-medium text-gray-600">Total</div>
+                      <div className="text-sm font-medium text-gray-600 mb-2">Total Tests</div>
+                      <div className="space-y-1 text-xs font-bold">
+                        <div className="text-green-700">✓ Passed: {state.widgets.telemetry.passed || 0}</div>
+                        <div className="text-red-700">✗ Failed: {state.widgets.telemetry.failed || 0}</div>
+                        <div className="text-gray-600">⊖ Skipped: {state.widgets.telemetry.skipped || 0}</div>
                       </div>
                     </div>
                   </div>
-                  <h4 className="text-sm font-bold text-gray-900 text-center">Critical Inbound</h4>
                 </div>
-
-                <div className="flex flex-col items-center">
-                  <div className="relative mb-3">
-                    <PieChartComponent 
-                      data={getWidgetChartData('outbound')} 
-                      size={140} 
-                      innerRadius={40} 
-                      showTotal={false}
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div className="text-center">
-                        <div className="text-lg font-bold text-gray-900">
-                          {(state.widgets.outbound.total || 0)}
-                        </div>
-                        <div className="text-xs font-medium text-gray-600">Total</div>
-                      </div>
-                    </div>
-                  </div>
-                  <h4 className="text-sm font-bold text-gray-900 text-center">Critical Outbound</h4>
-                </div>
+                <h3 className="text-2xl font-bold text-gray-900 text-center">Telemetry</h3>
               </div>
             </div>
           </div>
 
-          {/* Unified Remarks Section - Centered */}
-          <div className="mt-8 border-t border-gray-200 pt-6 text-center">
-            <h3 className="text-lg font-bold text-gray-900 mb-3 text-center">Test Case Failure Analysis</h3>
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 max-w-4xl mx-auto">
-              <div className="text-sm text-gray-800 leading-relaxed text-center">
-                <div className="mb-3 font-medium">
-                  {state.remarks.overall || 'No general remarks provided.'}
-                </div>
-                {state.remarks.telemetry && (
-                  <div className="mt-3 p-2 bg-white rounded border-l-4 border-blue-500">
-                    <strong>Critical Telemetry Analysis:</strong> {state.remarks.telemetry}
-                  </div>
-                )}
-                {state.remarks.inbound && (
-                  <div className="mt-3 p-2 bg-white rounded border-l-4 border-green-500">
-                    <strong>Critical Inbound Analysis:</strong> {state.remarks.inbound}
-                  </div>
-                )}
-                {state.remarks.outbound && (
-                  <div className="mt-3 p-2 bg-white rounded border-l-4 border-purple-500">
-                    <strong>Critical Outbound Analysis:</strong> {state.remarks.outbound}
-                  </div>
-                )}
+          {/* Analysis Section - Enhanced with Comments */}
+          <div className="mt-8 border-t-2 border-gray-300 pt-8">
+            <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center mr-3">
+                <span className="text-white text-sm">📋</span>
               </div>
-            </div>
+              Analysis & Insights
+            </h3>
+            
+            {comments.length > 0 ? (
+              <div className="space-y-4">
+                {comments.map((comment, index) => (
+                  <div key={comment.id} className={`rounded-2xl p-5 border shadow-sm ${
+                    index % 4 === 0 ? 'bg-blue-50/60 border-blue-100' :
+                    index % 4 === 1 ? 'bg-green-50/60 border-green-100' :
+                    index % 4 === 2 ? 'bg-purple-50/60 border-purple-100' :
+                    'bg-amber-50/60 border-amber-100'
+                  }`}>
+                    {comment.title && (
+                      <h4 className="text-lg font-semibold text-gray-800 mb-3">{comment.title}</h4>
+                    )}
+                    <p className={`text-gray-700 leading-relaxed whitespace-pre-wrap ${
+                      comment.formatting?.fontSize || 'text-base'
+                    } ${comment.formatting?.isBold ? 'font-bold' : ''} ${
+                      comment.formatting?.isItalic ? 'italic' : ''
+                    }`}>
+                      {comment.content}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-gradient-to-br from-gray-50 to-blue-50 border-2 border-gray-200 rounded-2xl p-8 shadow-lg text-center">
+                <div className="text-gray-500 text-lg">
+                  No analysis comments have been added yet.
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

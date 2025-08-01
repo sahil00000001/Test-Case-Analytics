@@ -28,6 +28,7 @@ export const remarksSchema = z.object({
   telemetry: z.string().optional(),
   inbound: z.string().optional(),
   outbound: z.string().optional(),
+  insights: z.string().optional(),
 });
 
 // Complete dashboard state schema with validation
@@ -36,8 +37,6 @@ export const dashboardStateSchema = z.object({
   testCases: testCaseDataSchema.partial(),
   widgets: z.object({
     telemetry: widgetDataSchema.partial(),
-    inbound: widgetDataSchema.partial(),
-    outbound: widgetDataSchema.partial(),
   }),
   remarks: remarksSchema,
 }).refine((data) => {
