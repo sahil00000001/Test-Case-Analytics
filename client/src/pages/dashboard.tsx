@@ -1174,10 +1174,7 @@ export default function Dashboard() {
 
               {/* Critical Features Chart */}
               <div className="flex flex-col justify-center items-center">
-                {/* Critical Features Heading */}
-                <h3 className="text-2xl font-bold text-gray-900 text-center mb-4">Critical Features</h3>
-                
-                <div className="flex flex-col items-center">
+                <div className="flex flex-col items-center" style={{ marginTop: '4rem' }}>
                   <div className="relative mb-6">
                     <PieChartComponent 
                       data={getWidgetChartData('telemetry')} 
@@ -1200,6 +1197,8 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </div>
+                {/* Critical Features Heading - Now below the chart */}
+                <h3 className="text-2xl font-bold text-gray-900 text-center">Critical Features</h3>
               </div>
             </div>
           </div>
